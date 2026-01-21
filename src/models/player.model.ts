@@ -27,25 +27,7 @@ export interface PlayersData {
   players: Player[];
 }
 
-export interface CreatePlayerDTO {
-  firstname: string;
-  lastname: string;
-  shortname?: string;
-  sex: 'M' | 'F';
-  country: {
-    code: string;
-    picture?: string;
-  };
-  picture?: string;
-  data: {
-    rank: number;
-    points: number;
-    weight: number;
-    height: number;
-    age: number;
-    last?: number[];
-  };
-}
+// CreatePlayerDTO is now exported from player.schema.ts (Zod-generated type)
 
 export interface Statistics {
   countryWithHighestWinRatio: {

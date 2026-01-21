@@ -1,9 +1,11 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import playerRoutes from './routes/player.routes';
 import statisticsRoutes from './routes/statistics.routes';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { requestLogger } from './middlewares/logger.middleware';
+import { swaggerSpec } from './config/swagger';
 
 const app: Application = express();
 
@@ -22,9 +24,16 @@ app.get('/', (_req, res) => {
     endpoints: {
       players: '/api/players',
       statistics: '/api/statistics',
+      documentation: '/api-docs',
     },
   });
 });
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Tennis API Documentation',
+}));
 
 // API Routes
 app.use('/api/players', playerRoutes);

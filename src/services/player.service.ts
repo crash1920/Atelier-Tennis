@@ -1,19 +1,22 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Player, PlayersData, CreatePlayerDTO } from '../models/player.model';
+import { Player, PlayersData } from '../models/player.model';
+import { CreatePlayerDTO } from '../schemas/player.schema';
 
 class PlayerService {
   private players: Player[] = [];
 
   private nextId: number = 1;
 
+  private dataPath: string;
+
   constructor() {
+    this.dataPath = path.join(__dirname, '../data/headtohead.json');
     this.loadPlayers();
   }
 
   private loadPlayers(): void {
-    const dataPath = path.join(__dirname, '../data/headtohead.json');
-    const rawData = fs.readFileSync(dataPath, 'utf-8');
+    const rawData = fs.readFileSync(this.dataPath, 'utf-8');
     const data: PlayersData = JSON.parse(rawData);
     this.players = data.players;
 
@@ -22,6 +25,13 @@ class PlayerService {
       const maxId = Math.max(...this.players.map((p) => p.id));
       this.nextId = maxId + 1;
     }
+  }
+
+  private saveToFile(): void {
+    const data: PlayersData = {
+      players: this.players,
+    };
+    fs.writeFileSync(this.dataPath, JSON.stringify(data, null, 2), 'utf-8');
   }
 
   getAllPlayers(): Player[] {
@@ -35,8 +45,8 @@ class PlayerService {
   }
 
   createPlayer(playerData: CreatePlayerDTO): Player {
-    // Validate required fields
-    this.validatePlayerData(playerData);
+    // Validation is now handled by Zod middleware at the route level
+    // No need for manual validation here
 
     // Create new player with generated ID
     const newPlayer: Player = {
@@ -63,55 +73,10 @@ class PlayerService {
     this.players.push(newPlayer);
     this.nextId += 1;
 
+    // Save to file after adding the player
+    this.saveToFile();
+
     return newPlayer;
-  }
-
-  private validatePlayerData(playerData: CreatePlayerDTO): void {
-    const errors: string[] = [];
-
-    if (!playerData.firstname || playerData.firstname.trim() === '') {
-      errors.push('firstname is required');
-    }
-
-    if (!playerData.lastname || playerData.lastname.trim() === '') {
-      errors.push('lastname is required');
-    }
-
-    if (!playerData.sex || !['M', 'F'].includes(playerData.sex)) {
-      errors.push('sex must be either M or F');
-    }
-
-    if (!playerData.country || !playerData.country.code) {
-      errors.push('country.code is required');
-    }
-
-    if (!playerData.data) {
-      errors.push('data is required');
-    } else {
-      if (typeof playerData.data.rank !== 'number' || playerData.data.rank < 1) {
-        errors.push('data.rank must be a positive number');
-      }
-
-      if (typeof playerData.data.points !== 'number' || playerData.data.points < 0) {
-        errors.push('data.points must be a non-negative number');
-      }
-
-      if (typeof playerData.data.weight !== 'number' || playerData.data.weight <= 0) {
-        errors.push('data.weight must be a positive number (in grams)');
-      }
-
-      if (typeof playerData.data.height !== 'number' || playerData.data.height <= 0) {
-        errors.push('data.height must be a positive number (in cm)');
-      }
-
-      if (typeof playerData.data.age !== 'number' || playerData.data.age < 1) {
-        errors.push('data.age must be a positive number');
-      }
-    }
-
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${errors.join(', ')}`);
-    }
   }
 
   getPlayers(): Player[] {

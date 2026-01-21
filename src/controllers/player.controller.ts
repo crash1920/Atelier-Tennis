@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { playerService } from '../services/player.service';
-import { CreatePlayerDTO } from '../models/player.model';
+import { CreatePlayerDTO } from '../schemas/player.schema';
 
 export class PlayerController {
   getAllPlayers(_req: Request, res: Response, next: NextFunction): void {
@@ -63,6 +63,7 @@ export class PlayerController {
 
   createPlayer(req: Request, res: Response, next: NextFunction): void {
     try {
+      // Request body is already validated and typed by Zod middleware
       const playerData: CreatePlayerDTO = req.body;
       const newPlayer = playerService.createPlayer(playerData);
 
@@ -71,15 +72,6 @@ export class PlayerController {
         data: newPlayer,
       });
     } catch (error) {
-      if (error instanceof Error && error.message.startsWith('Validation failed')) {
-        res.status(400).json({
-          success: false,
-          error: 'Validation Error',
-          message: error.message,
-          status: 400,
-        });
-        return;
-      }
       next(error);
     }
   }
