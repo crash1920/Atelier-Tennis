@@ -46,7 +46,15 @@ class PlayerService {
 
   createPlayer(playerData: CreatePlayerDTO): Player {
     // Validation is now handled by Zod middleware at the route level
-    // No need for manual validation here
+    // Business logic validation: Check for duplicate player
+    const existingPlayer = this.players.find(
+      (p) => p.firstname.toLowerCase() === playerData.firstname.toLowerCase() &&
+        p.lastname.toLowerCase() === playerData.lastname.toLowerCase()
+    );
+
+    if (existingPlayer) {
+      throw new Error(`Player ${playerData.firstname} ${playerData.lastname} already exists with ID ${existingPlayer.id}`);
+    }
 
     // Create new player with generated ID
     const newPlayer: Player = {

@@ -72,6 +72,16 @@ export class PlayerController {
         data: newPlayer,
       });
     } catch (error) {
+      // Handle duplicate player error
+      if (error instanceof Error && error.message.includes('already exists')) {
+        res.status(409).json({
+          success: false,
+          error: 'Conflict',
+          message: error.message,
+          status: 409,
+        });
+        return;
+      }
       next(error);
     }
   }
