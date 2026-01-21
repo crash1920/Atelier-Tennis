@@ -6,19 +6,16 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: 'Tennis Players API',
       version: '1.0.0',
-      description: 'A comprehensive API for managing tennis players and their statistics',
+      description:
+        'A comprehensive API for managing tennis players and their statistics',
       contact: {
         name: 'API Support',
       },
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Development server',
-      },
-      {
-        url: process.env.PRODUCTION_URL || 'https://your-api.elasticbeanstalk.com',
-        description: 'Production server (AWS Elastic Beanstalk)',
+        url: '/',
+        description: 'Current server',
       },
     ],
     tags: [
@@ -35,7 +32,16 @@ const options: swaggerJsdoc.Options = {
       schemas: {
         Player: {
           type: 'object',
-          required: ['id', 'firstname', 'lastname', 'shortname', 'sex', 'country', 'picture', 'data'],
+          required: [
+            'id',
+            'firstname',
+            'lastname',
+            'shortname',
+            'sex',
+            'country',
+            'picture',
+            'data',
+          ],
           properties: {
             id: {
               type: 'integer',
@@ -171,7 +177,14 @@ const options: swaggerJsdoc.Options = {
       },
     },
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // Path to API docs
+
+  // Scan both source and compiled files
+  apis: [
+    './src/routes/*.ts',
+    './src/controllers/*.ts',
+    './dist/routes/*.js',
+    './dist/controllers/*.js',
+  ],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

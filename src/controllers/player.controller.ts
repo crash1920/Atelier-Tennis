@@ -63,7 +63,6 @@ export class PlayerController {
 
   createPlayer(req: Request, res: Response, next: NextFunction): void {
     try {
-      // Request body is already validated and typed by Zod middleware
       const playerData: CreatePlayerDTO = req.body;
       const newPlayer = playerService.createPlayer(playerData);
 

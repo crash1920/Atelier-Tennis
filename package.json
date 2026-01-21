@@ -10,8 +10,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
-    "postinstall": "npm run build"
+    "lint:fix": "eslint src/**/*.ts --fix"
   },
   "keywords": [
     "tennis",
@@ -24,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": ">=20.0.0",
+    "node": "20.x",
     "npm": ">=10.0.0"
   },
   "dependencies": {

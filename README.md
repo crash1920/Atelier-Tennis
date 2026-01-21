@@ -1,56 +1,100 @@
 # Tennis Players Statistics API
 
-RESTful API for managing tennis player statistics. Built with Node.js, Express, and TypeScript.
+A RESTful API for managing tennis player statistics, built with Node.js, Express, and TypeScript.
+
+## Live Demo
+
+**Production:** http://tennis-players-env.eba-ecx3b7bt.eu-west-3.elasticbeanstalk.com/  
+**API Docs:** http://tennis-players-env.eba-ecx3b7bt.eu-west-3.elasticbeanstalk.com/api-docs/
+
+## Features
+
+- Complete CRUD operations for tennis players
+- Statistical calculations (country win ratios, BMI, median height)
+- Input validation with Zod
+- Duplicate player detection
+- Interactive API documentation with Swagger
+- Comprehensive error handling
+- Deployed on AWS Elastic Beanstalk
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/players` | Get all players (sorted by rank) |
+| GET | `/api/players/:id` | Get player by ID |
+| POST | `/api/players` | Create new player |
+| GET | `/api/statistics` | Get global statistics |
 
 ## Quick Start
 
 ```bash
-# Install dependencies
 npm install
-
-# Run in development
-npm run dev
-
-# Run tests
-npm test
-
-# Build for production
 npm run build
 npm start
 ```
 
-The API runs on `http://localhost:3000`
+The API will be available at `http://localhost:3000`
 
-## API Endpoints
+## Tech Stack
 
-### Get all players (sorted by rank)
+- **Runtime:** Node.js 20
+- **Framework:** Express.js
+- **Language:** TypeScript
+- **Validation:** Zod
+- **Documentation:** Swagger UI / OpenAPI 3.0
+- **Testing:** Jest (82% coverage)
+- **Deployment:** AWS Elastic Beanstalk
+
+## Project Structure
 
 ```
-GET /api/players
+src/
+├── controllers/     # Request handlers
+├── services/        # Business logic
+├── routes/          # Endpoint definitions
+├── schemas/         # Zod validation schemas
+├── middlewares/     # Express middleware
+├── models/          # TypeScript interfaces
+├── config/          # App configuration
+└── data/            # JSON data storage
 ```
 
-Returns all players sorted from best rank to worst.
+## Example Usage
 
-### Get player by ID
+### Get all players
 
+```bash
+curl http://tennis-players-env.eba-ecx3b7bt.eu-west-3.elasticbeanstalk.com/api/players
 ```
-GET /api/players/:id
-```
 
-Returns details for a specific player. Returns 404 if not found.
+### Create a player
+
+```bash
+curl -X POST http://tennis-players-env.eba-ecx3b7bt.eu-west-3.elasticbeanstalk.com/api/players \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstname": "Rafael",
+    "lastname": "Nadal",
+    "sex": "M",
+    "country": {"code": "ESP"},
+    "data": {
+      "rank": 1,
+      "points": 9850,
+      "weight": 85000,
+      "height": 185,
+      "age": 37
+    }
+  }'
+```
 
 ### Get statistics
 
-```
-GET /api/statistics
+```bash
+curl http://tennis-players-env.eba-ecx3b7bt.eu-west-3.elasticbeanstalk.com/api/statistics
 ```
 
-Returns:
-- Country with the highest win ratio (based on all players from that country)
-- Average BMI of all players
-- Median height of all players
-
-Example response:
+Response example:
 ```json
 {
   "success": true,
@@ -65,143 +109,66 @@ Example response:
 }
 ```
 
-### Create a new player
+## Development
 
-```
-POST /api/players
-Content-Type: application/json
+### Scripts
 
-{
-  "firstname": "Roger",
-  "lastname": "Federer",
-  "sex": "M",
-  "country": {
-    "code": "SUI"
-  },
-  "data": {
-    "rank": 3,
-    "points": 3000,
-    "weight": 85000,  // in grams
-    "height": 185,    // in cm
-    "age": 40
-  }
-}
+```bash
+npm run dev          # Start with auto-reload
+npm run build        # Compile TypeScript
+npm start            # Run production build
+npm test             # Run tests
+npm run lint         # Check code quality
 ```
 
-Required fields:
-- `firstname`, `lastname`, `sex` (M or F)
-- `country.code`
-- `data.rank`, `data.points`, `data.weight`, `data.height`, `data.age`
+### Testing
 
-The API will auto-generate an ID and shortname if you don't provide one.
-
-## Testing
+The project includes unit and integration tests with Jest:
 
 ```bash
 npm test
 ```
 
-Current coverage: 82% branches, 91% statements.
+Coverage: 82% branches, 91% statements.
 
-Tests include:
-- Unit tests for all service logic
-- Integration tests for all endpoints
-- Validation and error handling
+## Deployment
 
-## Code Quality
+Deployed on AWS Elastic Beanstalk (eu-west-3, Paris).
 
-The project uses:
-- TypeScript with strict mode
-- ESLint with Airbnb style guide
-- Jest for testing
+To deploy your own instance:
 
-Check linting:
-```bash
-npm run lint
-```
-
-## Project Structure
-
-```
-src/
-├── controllers/      # HTTP handlers
-├── services/        # Business logic
-├── models/          # TypeScript types
-├── routes/          # Route definitions
-├── middlewares/     # Error handling, logging
-└── data/            # JSON data
-```
-
-## Tech Stack
-
-- Node.js 20+
-- Express.js
-- TypeScript
-- Jest & Supertest
-- ESLint
-
-## Deployment on AWS
-
-### Option 1: AWS Elastic Beanstalk (Recommended)
-
-1. Install the EB CLI:
 ```bash
 pip install awsebcli
-```
-
-2. Initialize EB:
-```bash
 eb init
-```
-- Choose your region
-- Select "Node.js" platform
-- Use default settings
-
-3. Create environment and deploy:
-```bash
-eb create tennis-api-env
+eb create your-app-name --single
+eb deploy
 ```
 
-4. Open your app:
-```bash
-eb open
+## Architecture
+
+The API follows the MVC pattern:
+
+```
+Request → Route → Validation Middleware → Controller → Service → Response
 ```
 
-### Option 2: AWS App Runner
+- **Routes** define endpoints and apply middleware
+- **Validation middleware** uses Zod to validate request data
+- **Controllers** handle HTTP logic
+- **Services** contain business logic
 
-1. Push your code to GitHub
+## Error Handling
 
-2. Go to AWS App Runner console
+All errors return a consistent format:
 
-3. Create a new service:
-   - Source: GitHub repository
-   - Build settings: Automatic
-   - Start command: `npm start`
-
-### Option 3: AWS Lambda + API Gateway
-
-For serverless deployment, you'd need to adapt the Express app to use `serverless-http`.
-
-## Environment Variables
-
-Set these in your AWS environment:
-- `PORT`: 8080 (or whatever AWS uses)
-- `NODE_ENV`: production
-
-## Notes
-
-- Player data is loaded from `headtohead.json` on startup
-- New players are stored in memory (resets on restart)
-- For production use with persistence, consider adding DynamoDB or RDS
-
-## Development
-
-The codebase follows standard REST practices:
-- Proper HTTP status codes (200, 201, 400, 404, 500)
-- Consistent error responses
-- Input validation
-- TypeScript strict mode for type safety
-- Request logging
+```json
+{
+  "success": false,
+  "error": "Error type",
+  "message": "Detailed message",
+  "status": 400
+}
+```
 
 ## License
 
